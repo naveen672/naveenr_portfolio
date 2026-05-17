@@ -8,21 +8,39 @@ import { About } from '@/components/sections/About';
 import { Founder } from '@/components/sections/Founder';
 import { Contact } from '@/components/sections/Contact';
 import { Footer } from '@/components/sections/Footer';
-import WaterCursor from '@/components/WaterCursor';
 import { FloatingConsultButton } from '@/components/ui/floating-consult-button';
+import { Agentation } from 'agentation';
+import naveenImage from '@/assets/naveen.jpeg';
 
 const Index = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
+  const [showFloatingButton, setShowFloatingButton] = useState(false);
 
   const handleSplashComplete = () => {
     setShowSplash(false);
     setTimeout(() => setContentVisible(true), 100);
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show floating button after scrolling past hero section (approximately 100vh)
+      const scrollPosition = window.scrollY;
+      const heroHeight = window.innerHeight;
+      
+      if (scrollPosition > heroHeight * 0.8) {
+        setShowFloatingButton(true);
+      } else {
+        setShowFloatingButton(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <>
-      <WaterCursor />
       {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
       
       <div 
@@ -42,9 +60,9 @@ const Index = () => {
         <Footer />
         
         {/* Floating Consult Button */}
-        {contentVisible && (
+        {contentVisible && showFloatingButton && (
           <FloatingConsultButton
-            imageSrc="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop"
+            imageSrc={naveenImage}
             revolvingText="GET IN TOUCH - LET'S CONNECT - FREE CONSULTATION - "
             revolvingSpeed={8}
             popupHeading="Let's Talk"
@@ -58,6 +76,9 @@ const Index = () => {
           />
         )}
       </div>
+      
+      {/* Agentation - Visual feedback for AI agents (dev only) */}
+      {import.meta.env.DEV && <Agentation />}
     </>
   );
 };

@@ -1,6 +1,6 @@
 import { RevealSection } from '@/components/RevealSection';
 import { ParallaxOrb } from '@/components/ParallaxOrb';
-import { Mail, Github, Linkedin, Instagram, ArrowUpRight, Send, Copy, Check, MessageCircle, Loader2 } from 'lucide-react';
+import { Mail, Github, Linkedin, Instagram, ArrowUpRight, Send, Copy, Check, MessageCircle, Loader2, Youtube } from 'lucide-react';
 import { useState, useRef } from 'react';
 import emailjs from '@emailjs/browser';
 import { useToast } from '@/hooks/use-toast';
@@ -8,8 +8,9 @@ import { useToast } from '@/hooks/use-toast';
 const socialLinks = [
   { label: 'GitHub', href: 'https://github.com/naveen672', icon: Github },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/naveen-r-mys/', icon: Linkedin },
-  { label: 'Instagram', href: 'https://www.instagram.com/naveen_r_99?igsh=cG9namF4Y2UxanFu&utm_source=qr', icon: Instagram },
+  { label: 'Instagram', href: 'https://www.instagram.com/techvibe.ka?igsh=engzaDVscDFrcWQ0&utm_source=qr', icon: Instagram },
   { label: 'WhatsApp', href: 'https://wa.me/919611391210', icon: MessageCircle },
+  { label: 'YouTube', href: 'https://www.youtube.com/@TechVibeKA', icon: Youtube },
 ];
 
 // EmailJS Configuration - Replace these with your actual EmailJS credentials

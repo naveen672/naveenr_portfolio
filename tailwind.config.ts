@@ -116,6 +116,10 @@ export default {
           "0%, 100%": { backgroundPosition: "0% 50%" },
           "50%": { backgroundPosition: "100% 50%" },
         },
+        "spin-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -126,6 +130,7 @@ export default {
         "slide-in-right": "slide-in-right 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards",
         "blink": "blink 1s step-end infinite",
         "gradient-shift": "gradient-shift 6s ease infinite",
+        "spin-slow": "spin-slow 20s linear infinite",
       },
       transitionTimingFunction: {
         'smooth': 'cubic-bezier(0.22, 1, 0.36, 1)',
