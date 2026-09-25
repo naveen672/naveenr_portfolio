@@ -1,4 +1,4 @@
-﻿import Preloader from "@/components/ui/preloader";
+import Preloader from "@/components/ui/preloader";
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -7,3 +7,4 @@ interface SplashScreenProps {
 export function SplashScreen({ onComplete }: SplashScreenProps) {
   return <Preloader onComplete={onComplete} />;
 }
+

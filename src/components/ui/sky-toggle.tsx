@@ -9,7 +9,10 @@ export function SkyToggle() {
         type="checkbox" 
         className="sr-only" 
         checked={isDark}
-        onChange={toggle}
+        onChange={(e) => {
+          const r = e.currentTarget.closest('label')?.getBoundingClientRect();
+          toggle(r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : undefined);
+        }}
         aria-label="Toggle theme"
       />
       <div className="theme-switch__container">

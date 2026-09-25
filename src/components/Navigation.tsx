@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Terminal, Menu, X } from 'lucide-react';
 import { SkyToggle } from '@/components/ui/sky-toggle';
 
 const navItems = [
-  { label: 'Work', href: '#work' },
   { label: 'Stack', href: '#stack' },
+  { label: 'Work', href: '#work' },
   { label: 'About', href: '#about' },
   { label: 'Contact', href: '#contact' },
 ];
@@ -13,15 +14,47 @@ const navItems = [
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // Tone follows whatever is under the bar: sections mark themselves with data-nav-tone="dark".
+  const [tone, setTone] = useState<'light' | 'dark'>('light');
+  const [active, setActive] = useState<string | null>(null);
 
   useEffect(() => {
+    let frame = 0;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 80);
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        setIsScrolled(window.scrollY > 80);
+
+        const probe = 32;
+        const dark = [...document.querySelectorAll<HTMLElement>('[data-nav-tone="dark"]')].some((el) => {
+          const r = el.getBoundingClientRect();
+          return r.top <= probe && r.bottom > probe;
+        });
+        setTone(dark ? 'dark' : 'light');
+
+        const line = window.innerHeight * 0.4;
+        const current = navItems.find(({ href }) => {
+          const r = document.querySelector(href)?.getBoundingClientRect();
+          return r && r.top <= line && r.bottom > line;
+        });
+        setActive(current?.href ?? null);
+      });
     };
 
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setIsMobileMenuOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isMobileMenuOpen]);
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
@@ -37,14 +70,13 @@ export function Navigation() {
       <nav
         className={cn(
           'fixed top-0 left-0 right-0 z-[10000] w-full transition-all duration-500 ease-smooth',
-          // Ultra-glass: heavy blur + saturation, very transparent surface
-          'backdrop-blur-[48px] backdrop-saturate-[220%]',
-          // If backdrop-filter is supported, go extremely transparent; otherwise use a safer fallback
-          'supports-[backdrop-filter]:bg-background/6 bg-background/40',
-          'border-b border-border/12 ring-1 ring-border/10',
+          'backdrop-blur-xl backdrop-saturate-150',
+          // `dark` scopes dark tokens to the bar while it sits over a dark section
+          tone === 'dark' && 'dark',
           isScrolled
-            ? 'py-3 shadow-sm supports-[backdrop-filter]:bg-background/4'
-            : 'py-6'
+            ? cn('py-3 border-b', tone === 'dark' ? 'bg-[#07080b]/70 border-white/10' : 'bg-background/75 border-border/60')
+            : 'py-6 border-b border-transparent',
+          'text-foreground'
         )}
       >
         <div className="max-w-6xl 2xl:max-w-[1400px] mx-auto px-6 md:px-12 flex justify-between items-center">
@@ -52,7 +84,8 @@ export function Navigation() {
           {/* Logo */}
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="flex items-center gap-2 group glass-ripple rounded-2xl p-1.5 -m-1.5"
+            aria-label="Naveen R — back to top"
+            className="flex items-center gap-2 group rounded-2xl p-1.5 -m-1.5"
           >
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30">
               <Terminal className="w-5 h-5 text-primary-foreground" />
@@ -69,8 +102,19 @@ export function Navigation() {
                 <li key={item.label}>
                   <button
                     onClick={() => scrollToSection(item.href)}
-                    className="glass-nav-link text-caption font-medium transition-colors"
+                    aria-current={active === item.href ? 'location' : undefined}
+                    className={cn(
+                      'relative isolate rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300',
+                      active === item.href ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+                    )}
                   >
+                    {active === item.href && (
+                      <motion.span
+                        layoutId="nav-active"
+                        className="absolute inset-0 -z-10 rounded-full bg-foreground/[0.08]"
+                        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                      />
+                    )}
                     {item.label}
                   </button>
                 </li>
@@ -87,6 +131,9 @@ export function Navigation() {
 
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-menu"
               className="p-2.5 rounded-xl liquid-glass-button"
             >
               {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -97,6 +144,9 @@ export function Navigation() {
 
       {/* ================= Mobile Menu ================= */}
       <div
+        id="mobile-menu"
+        // Keep the closed menu out of the tab order (React 18 needs the string form of `inert`)
+        {...(!isMobileMenuOpen && { inert: '' })}
         className={cn(
           'fixed inset-0 z-40 md:hidden transition-all duration-500',
           isMobileMenuOpen
