@@ -22,3 +22,39 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Local Claude Code settings
+.claude/
+
+# Source media kept locally (the site ships optimised copies in public/hero and src/assets/*/)
+/Blue White Cloud Welcome to My Channel YouTube Intro Video.mp4
+/clouds_animation (2).mp4
+/cloudsanimation.svg
+/LastoriaBoldRegular.otf
+/naveenr_updated.png
+/public/clouds_animation.mp4
+/public/clouds_animation2.mp4
+/public/naveen_intro.mp4
+/src/assets/cloud.json
+/src/assets/jssp.png
+/src/assets/jsspn.png
+/src/assets/jsswp.png
+/src/assets/tiny.png
+/src/assets/naveenr_updated.png
+
+# Experimental components not used on the page
+/src/components/attraction.tsx
+/src/components/sections/Gallery.tsx
+/src/components/ui/balloons.tsx
+/src/components/ui/cursor-driven-particle-typography.tsx
+/src/components/ui/eye-tracking.tsx
+/src/components/ui/gallery4.tsx
+/src/components/ui/img-sphere.tsx
+/src/components/ui/interactive-image-accordion.tsx
+/src/components/ui/portfolio-and-image-gallery.tsx
+/src/components/ui/scroll-based-velocity.tsx
+/src/components/ui/sticky-scroll-cards.tsx
