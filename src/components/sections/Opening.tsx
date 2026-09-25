@@ -281,7 +281,7 @@ export function Opening() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10" />
         <div className="relative z-10 flex h-full flex-col justify-end">
           <h1 className="mx-auto w-full max-w-6xl 2xl:max-w-[1400px] px-5 sm:px-6 md:px-12 text-sm font-medium uppercase tracking-[0.2em] text-white/70">
-            Hi, I'm Naveen
+            Hi, I'm Naveen R
           </h1>
           {content}
         </div>
@@ -325,7 +325,8 @@ export function Opening() {
             transition={{ duration: 1.2, ease: EASE_OUT, delay: 0.2 }}
             className="hero-title font-display font-medium leading-[0.95] tracking-[-0.045em] text-[clamp(3.25rem,12vw,10.5rem)]"
           >
-            <TextRepel text="Hi, I'm Naveen" radius={160} strength={55} />
+            <span className="sr-only">Hi, I'm Naveen R</span>
+            <TextRepel text="Hi, I'm Naveen" radius={160} strength={55} srText={false} />
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}

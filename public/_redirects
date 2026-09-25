@@ -1,0 +1,4 @@
+# One canonical home: send the Netlify subdomain and www to https://naveenrdev.in
+https://naveenrdev.netlify.app/*  https://naveenrdev.in/:splat  301!
+http://naveenrdev.netlify.app/*   https://naveenrdev.in/:splat  301!
+https://www.naveenrdev.in/*       https://naveenrdev.in/:splat  301!
