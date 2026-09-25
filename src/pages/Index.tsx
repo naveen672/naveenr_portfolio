@@ -5,12 +5,12 @@ import { Opening } from '@/components/sections/Opening';
 import { Work } from '@/components/sections/Work';
 import { Skills } from '@/components/sections/Skills';
 import { About } from '@/components/sections/About';
-import { Founder } from '@/components/sections/Founder';
 import { Contact } from '@/components/sections/Contact';
 import { Footer } from '@/components/sections/Footer';
 import { FloatingConsultButton } from '@/components/ui/floating-consult-button';
 import { Agentation } from 'agentation';
-import naveenImage from '@/assets/naveen.jpeg';
+import ReactLenis from 'lenis/react';
+import naveenImage from '@/assets/about/portrait.webp';
 
 const Index = () => {
   const [showSplash, setShowSplash] = useState(true);
@@ -24,23 +24,20 @@ const Index = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show floating button after scrolling past hero section (approximately 100vh)
-      const scrollPosition = window.scrollY;
-      const heroHeight = window.innerHeight;
-      
-      if (scrollPosition > heroHeight * 0.8) {
-        setShowFloatingButton(true);
-      } else {
-        setShowFloatingButton(false);
-      }
+      // Show after the hero; hide once Contact is on screen, where it would be redundant
+      // and would cover the form and footer controls.
+      const stackTop = document.getElementById('stack')?.getBoundingClientRect().top ?? Infinity;
+      const pastHero = stackTop < window.innerHeight * 0.5;
+      const contactTop = document.getElementById('contact')?.getBoundingClientRect().top ?? Infinity;
+      setShowFloatingButton(pastHero && contactTop > window.innerHeight * 0.6);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <>
+    <ReactLenis root>
       {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
       
       <div 
@@ -54,7 +51,6 @@ const Index = () => {
           <Skills />
           <Work />
           <About />
-          <Founder />
           <Contact />
         </main>
         <Footer />
@@ -63,8 +59,8 @@ const Index = () => {
         {contentVisible && showFloatingButton && (
           <FloatingConsultButton
             imageSrc={naveenImage}
-            revolvingText="GET IN TOUCH - LET'S CONNECT - FREE CONSULTATION - "
-            revolvingSpeed={8}
+            revolvingText="GET IN TOUCH · LET'S CONNECT · FREE CONSULTATION · "
+            revolvingSpeed={14}
             popupHeading="Let's Talk"
             popupDescription="Schedule a free 30-minute consultation to discuss your project. I'd love to hear about your ideas and help bring them to life."
             popupBadgeText="Free"
@@ -79,7 +75,7 @@ const Index = () => {
       
       {/* Agentation - Visual feedback for AI agents (dev only) */}
       {import.meta.env.DEV && <Agentation />}
-    </>
+    </ReactLenis>
   );
 };
 

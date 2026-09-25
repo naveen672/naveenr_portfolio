@@ -1,9 +1,9 @@
 import { RevealSection } from '@/components/RevealSection';
-import { ParallaxOrb } from '@/components/ParallaxOrb';
-import { Mail, Github, Linkedin, Instagram, ArrowUpRight, Send, Copy, Check, MessageCircle, Loader2, Youtube } from 'lucide-react';
+import { Github, Linkedin, Instagram, ArrowUpRight, Copy, Check, MessageCircle, Youtube } from 'lucide-react';
 import { useState, useRef } from 'react';
 import emailjs from '@emailjs/browser';
 import { useToast } from '@/hooks/use-toast';
+import { SlideButton } from '@/components/ui/slide-button';
 
 const socialLinks = [
   { label: 'GitHub', href: 'https://github.com/naveen672', icon: Github },
@@ -20,16 +20,20 @@ const EMAILJS_PUBLIC_KEY = '2Psm_VKXWVtUVwOUN';
 
 export function Contact() {
   const [copied, setCopied] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sliderStatus, setSliderStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
   const email = 'naveenravi.ch@gmail.com';
 
-  const copyEmail = () => {
-    navigator.clipboard.writeText(email);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast({ title: "Couldn't copy", description: `Email me at ${email}`, variant: "destructive" });
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -37,20 +41,20 @@ export function Contact() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const canSend = () => {
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       toast({
         title: "Missing fields",
         description: "Please fill in all fields before sending.",
         variant: "destructive"
       });
-      return;
+      return false;
     }
+    return true;
+  };
 
-    setIsSubmitting(true);
-
+  const sendEmail = async () => {
+    setSliderStatus('loading');
     try {
       await emailjs.send(
         EMAILJS_SERVICE_ID,
@@ -63,191 +67,128 @@ export function Contact() {
         },
         EMAILJS_PUBLIC_KEY
       );
-
+      setSliderStatus('success');
       toast({
         title: "Message sent!",
         description: "Thank you for reaching out. I'll get back to you soon!",
       });
-
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {
       console.error('EmailJS error:', error);
+      setSliderStatus('error');
       toast({
         title: "Failed to send",
         description: "Something went wrong. Please try again or email me directly.",
         variant: "destructive"
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  };
+
+  const inputClass =
+    'w-full px-4 py-3.5 rounded-2xl bg-white/[0.04] border border-white/10 text-foreground placeholder:text-white/35 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/30 transition-colors';
+
   return (
-    <section id="contact" className="py-16 md:py-section px-4 sm:px-6 md:px-12 lg:px-24 relative overflow-hidden">
-      {/* iOS 26 Orbs with Parallax */}
-      <div className="absolute inset-0 pointer-events-none">
-        <ParallaxOrb variant="primary" speed={0.05} className="w-[300px] h-[300px] md:w-[500px] md:h-[500px] bottom-[-100px] md:bottom-[-200px] left-1/2 -translate-x-1/2" />
-        <ParallaxOrb variant="secondary" speed={0.08} className="w-[150px] h-[150px] md:w-[300px] md:h-[300px] top-20 right-[-50px] md:right-[-100px] hidden sm:block" style={{ animationDelay: '3s' }} />
-      </div>
+    // `dark` scopes the dark tokens to this finale, whatever the site theme is.
+    <section id="contact" data-nav-tone="dark" className="dark relative overflow-hidden bg-[#07080b] text-foreground px-5 sm:px-8 md:px-12 pt-28 md:pt-40 pb-20">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-0 h-[60vh] w-[90vw] -translate-x-1/2 -translate-y-1/3 rounded-full blur-[120px] opacity-30"
+        style={{ background: 'radial-gradient(closest-side, hsl(195 80% 55%), transparent)' }}
+      />
 
-      <div className="max-w-6xl 2xl:max-w-[1400px] mx-auto relative">
+      <div className="relative mx-auto max-w-6xl 2xl:max-w-[1400px]">
         <RevealSection>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 liquid-glass-badge mb-4 md:mb-6">
-            <Send className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
-            <span className="text-xs md:text-caption font-medium text-primary">Get in Touch</span>
-          </div>
-        </RevealSection>
-
-        <RevealSection delay={100}>
-          <h2 className="text-3xl sm:text-4xl md:text-display font-display mb-4 md:mb-6">
-            Let's <span className="gradient-text">connect</span>
+          <h2 className="font-display text-[clamp(3rem,10vw,9rem)] font-medium leading-[0.92] tracking-[-0.05em] text-balance">
+            Let’s build <span className="gradient-text">something.</span>
           </h2>
         </RevealSection>
-
-        <RevealSection delay={200}>
-          <p className="text-base md:text-subheading text-muted-foreground max-w-xl mb-8 md:mb-12">
-            Always interested in hearing about new projects, collaborations, 
-            or just chatting about tech.
+        <RevealSection delay={100}>
+          <p className="mt-6 max-w-xl text-lg md:text-xl text-muted-foreground text-pretty">
+            Always interested in hearing about new projects, collaborations, or just chatting about tech.
           </p>
         </RevealSection>
 
-        {/* Contact Form */}
-        <RevealSection delay={250}>
-          <form ref={formRef} onSubmit={handleSubmit} className="mb-8 md:mb-12 p-4 md:p-6 rounded-2xl md:rounded-3xl liquid-glass-card">
-            <div className="grid gap-4 md:gap-6">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-muted-foreground mb-2">
-                    Your Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="John Doe"
-                    className="w-full px-4 py-3 rounded-xl bg-background/50 border border-border/50 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                  />
+        <div className="mt-14 md:mt-20 grid gap-10 lg:grid-cols-12 lg:gap-16">
+          {/* Form */}
+          <RevealSection delay={150} className="lg:col-span-7">
+            <form
+              ref={formRef}
+              onSubmit={handleSubmit}
+              className="rounded-[28px] bg-white/[0.03] p-5 md:p-8 ring-1 ring-white/10"
+            >
+              <div className="grid gap-5">
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <div>
+                    <label htmlFor="name" className="mb-2 block text-sm text-muted-foreground">Your name</label>
+                    <input type="text" id="name" name="name" autoComplete="name" value={formData.name} onChange={handleInputChange} placeholder="John Doe" className={inputClass} />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="mb-2 block text-sm text-muted-foreground">Your email</label>
+                    <input type="email" id="email" name="email" autoComplete="email" value={formData.email} onChange={handleInputChange} placeholder="john@example.com" className={inputClass} />
+                  </div>
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-muted-foreground mb-2">
-                    Your Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="john@example.com"
-                    className="w-full px-4 py-3 rounded-xl bg-background/50 border border-border/50 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                  />
+                  <label htmlFor="message" className="mb-2 block text-sm text-muted-foreground">Message</label>
+                  <textarea id="message" name="message" value={formData.message} onChange={handleInputChange} rows={5} placeholder="Hi Naveen, I’d like to discuss…" className={`${inputClass} resize-none`} />
+                </div>
+                <div className="pt-1">
+                  <SlideButton canComplete={canSend} onSlide={sendEmail} sliderStatus={sliderStatus} />
                 </div>
               </div>
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-muted-foreground mb-2">
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  rows={4}
-                  placeholder="Hi Naveen, I'd like to discuss..."
-                  className="w-full px-4 py-3 rounded-xl bg-background/50 border border-border/50 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            </form>
+          </RevealSection>
+
+          {/* Direct lines */}
+          <RevealSection delay={250} className="lg:col-span-5">
+            <p className="text-sm text-muted-foreground">Email</p>
+            <div className="mt-2 flex items-center gap-3">
+              <a
+                href={`mailto:${email}`}
+                className="min-w-0 truncate font-display text-xl md:text-2xl font-medium tracking-[-0.02em] underline decoration-white/20 underline-offset-8 transition-colors hover:decoration-primary"
               >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    Send Message
-                  </>
-                )}
+                {email}
+              </a>
+              <button
+                type="button"
+                onClick={copyEmail}
+                aria-label={copied ? 'Email copied' : 'Copy email address'}
+                className="shrink-0 rounded-full p-2.5 ring-1 ring-white/10 transition-colors hover:bg-white/10"
+              >
+                {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4 text-muted-foreground" />}
               </button>
             </div>
-          </form>
-        </RevealSection>
 
-        <RevealSection delay={300}>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4 mb-8 md:mb-12">
-            <a
-              href={`mailto:${email}`}
-              className="group flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl md:rounded-3xl liquid-glass-card"
-            >
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <Mail className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" />
-              </div>
-              <span className="text-base md:text-xl font-display font-semibold group-hover:text-primary transition-colors break-all">
-                {email}
+            <p className="mt-10 text-sm text-muted-foreground">Elsewhere</p>
+            <ul className="mt-2 divide-y divide-white/10 border-y border-white/10">
+              {socialLinks.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-4 py-4"
+                  >
+                    <link.icon className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-primary" aria-hidden />
+                    <span className="flex-1 text-lg font-medium">{link.label}</span>
+                    <ArrowUpRight className="h-5 w-5 text-muted-foreground transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" aria-hidden />
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-10 flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
               </span>
-            </a>
-            
-            <button
-              onClick={copyEmail}
-              className="p-3 md:p-4 rounded-xl md:rounded-2xl liquid-glass-button self-start sm:self-auto"
-            >
-              {copied ? (
-                <Check className="w-4 h-4 md:w-5 md:h-5 text-green-500" />
-              ) : (
-                <Copy className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
-              )}
-            </button>
-          </div>
-        </RevealSection>
-
-        <RevealSection delay={400}>
-          <div className="flex flex-wrap gap-3 md:gap-4">
-            {socialLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-2.5 md:gap-3 px-4 py-3 md:px-5 md:py-3.5 rounded-xl md:rounded-2xl liquid-glass-card"
-              >
-                <link.icon className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
-                <span className="font-medium text-sm md:text-base text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                  {link.label}
-                </span>
-                <ArrowUpRight className="w-3.5 h-3.5 md:w-4 md:h-4 text-muted-foreground opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-primary transition-all duration-300" />
-              </a>
-            ))}
-          </div>
-        </RevealSection>
-
-        {/* Code snippet */}
-        <RevealSection delay={500}>
-          <div className="mt-12 md:mt-16 p-4 md:p-6 rounded-2xl md:rounded-3xl liquid-glass-card overflow-hidden">
-            <div className="flex items-center gap-1.5 md:gap-2 mb-3 md:mb-4">
-              <span className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-red-400" />
-              <span className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-yellow-400" />
-              <span className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-green-400" />
-              <span className="ml-2 md:ml-3 text-[10px] md:text-xs text-muted-foreground font-mono">contact.ts</span>
-            </div>
-            <pre className="font-mono text-xs md:text-sm overflow-x-auto">
-              <code className="text-muted-foreground">
-                <span className="text-primary">const</span> developer = {'{\n'}
-                {'  '}name: <span className="text-green-500">"Naveen R"</span>,{'\n'}
-                {'  '}available: <span className="text-accent">true</span>,{'\n'}
-                {'  '}location: <span className="text-green-500">"Mysore / Bangalore"</span>,{'\n'}
-                {'  '}interests: [<span className="text-green-500">"AI"</span>, <span className="text-green-500">"Web"</span>, <span className="text-green-500">"Systems"</span>]{'\n'}
-                {'}'};
-              </code>
-            </pre>
-          </div>
-        </RevealSection>
+              Based in Mysore / Bangalore · Available for projects
+            </p>
+          </RevealSection>
+        </div>
       </div>
     </section>
   );

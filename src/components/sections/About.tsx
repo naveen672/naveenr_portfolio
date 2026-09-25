@@ -1,208 +1,223 @@
-import { RevealSection } from '@/components/RevealSection';
-import { ParallaxOrb } from '@/components/ParallaxOrb';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Coffee, Book, Headphones, MapPin, Briefcase, Heart, User, Server } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRight, Instagram, Maximize2, Youtube } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import synamediaLogo from '@/assets/synamedia-logo.png';
-import awardImage from '@/assets/award.jpeg';
+import awardImage from '@/assets/about/award.webp';
+import portrait from '@/assets/about/portrait.webp';
+import iheLogo from '@/assets/about/ihe-logo.webp';
+
+const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+const figures = [
+  { value: '4+', label: 'Years building software' },
+  { value: '50+', label: 'Projects delivered' },
+  { value: '100+', label: 'Clients' },
+  { value: '1,500+', label: 'Students trained' },
+];
+
+const tile =
+  'relative overflow-hidden rounded-[28px] bg-card ring-1 ring-border/70 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_32px_-16px_rgba(0,0,0,0.12)]';
 
 export function About() {
+  const reduceMotion = useReducedMotion();
+  const reveal = (i: number) =>
+    reduceMotion
+      ? {}
+      : {
+          initial: { opacity: 0, y: 36 },
+          whileInView: { opacity: 1, y: 0 },
+          viewport: { once: true, margin: '-10% 0px' },
+          transition: { duration: 0.9, ease: EASE_OUT, delay: i * 0.07 },
+        };
+
   return (
-    <section id="about" className="py-16 md:py-section px-4 sm:px-6 md:px-12 lg:px-24 relative overflow-hidden">
-      {/* iOS 26 Orbs with Parallax */}
-      <div className="absolute inset-0 pointer-events-none">
-        <ParallaxOrb variant="secondary" speed={0.05} className="w-[250px] h-[250px] md:w-[400px] md:h-[400px] bottom-[-50px] md:bottom-[-100px] right-[-50px] md:right-[-100px]" style={{ animationDelay: '2s' }} />
-      </div>
-      <div className="max-w-6xl 2xl:max-w-[1400px] mx-auto">
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16">
-          <div className="lg:col-span-5">
-            <RevealSection>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 liquid-glass-badge mb-4 md:mb-6">
-                <User className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
-                <span className="text-xs md:text-caption font-medium text-primary">About Me</span>
-              </div>
-            </RevealSection>
-            
-            <RevealSection delay={100}>
-              <h2 className="text-2xl sm:text-3xl md:text-heading font-display mb-4 md:mb-6">
-                A bit about <span className="gradient-text">me</span>
-              </h2>
-            </RevealSection>
+    <section id="about" className="relative py-28 md:py-40 px-5 sm:px-8 md:px-12">
+      <div className="mx-auto max-w-6xl 2xl:max-w-[1400px]">
+        <motion.h2
+          {...reveal(0)}
+          className="font-display text-[clamp(2.75rem,8vw,7rem)] font-medium leading-[0.95] tracking-[-0.045em] text-balance"
+        >
+          A bit about <span className="gradient-text">me.</span>
+        </motion.h2>
+        <motion.p {...reveal(1)} className="mt-6 max-w-2xl text-lg md:text-xl leading-relaxed text-muted-foreground text-pretty">
+          I’m a software engineer and technical consultant who loves turning complex problems into simple, scalable
+          solutions, across DevOps, automation and full-stack systems.
+        </motion.p>
 
-            {/* Current Role */}
-            <RevealSection delay={150}>
-              <div className="p-4 md:p-5 rounded-2xl md:rounded-3xl liquid-glass-card mb-4 md:mb-6">
-                <p className="text-xs md:text-caption text-muted-foreground mb-2 font-mono">Currently working at</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl md:rounded-3xl overflow-hidden flex items-center justify-center">
-                    <img src={synamediaLogo} alt="Synamedia" className="w-full h-full object-contain" />
-                  </div>
-                  <div>
-                    <p className="text-sm md:text-body font-semibold">Synamedia</p>
-                    <p className="text-xs md:text-caption text-muted-foreground">SRE / DevOps / AI / Automation Engineer</p>
-                  </div>
-                </div>
-              </div>
-            </RevealSection>
+        <div className="mt-14 md:mt-20 grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4">
+          {/* Portrait */}
+          <motion.figure {...reveal(0)} className={cn(tile, 'md:col-span-3 lg:col-span-4 lg:row-span-2 min-h-[420px] bg-black')}>
+            <img
+              src={portrait}
+              alt="Naveen R"
+              className="absolute inset-0 h-full w-full object-cover object-top"
+              loading="lazy"
+            />
+            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-6 pt-20 text-white">
+              <p className="font-display text-2xl font-medium tracking-[-0.02em]">Naveen R</p>
+              <p className="mt-1 text-sm text-white/70">Mysore / Bangalore, India</p>
+            </figcaption>
+          </motion.figure>
 
-            {/* Quick facts */}
-            <RevealSection delay={200}>
-              <div className="space-y-3 md:space-y-4">
-                {[
-                  {
-                    icon: Server,
-                    text: 'Large-scale, high-availability media/streaming systems (observability, automation, reliability).',
-                  },
-                  { icon: MapPin, text: 'India' },
-                  { icon: Briefcase, text: '4+ years building software' },
-                  { icon: Heart, text: 'Open source contributor' },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 text-muted-foreground group">
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl liquid-glass-button flex items-center justify-center">
-                      <item.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
-                    </div>
-                    <span className={i === 0 ? 'text-xs md:text-caption leading-snug' : 'text-sm md:text-body'}>
-                      {item.text}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </RevealSection>
-
-            {/* Stats with liquid animation */}
-            <RevealSection delay={300}>
-              <div className="grid grid-cols-3 gap-3 mt-6 md:mt-8">
-                {[
-                  { value: '4+', label: 'Years Experience' },
-                  { value: '50+', label: 'Projects' },
-                  { value: '100+', label: 'Clients' },
-                ].map((stat, i) => (
-                  <div 
-                    key={i} 
-                    className="group relative p-4 md:p-5 rounded-2xl md:rounded-3xl liquid-glass-card text-center overflow-hidden transition-all duration-500 hover:scale-105"
-                  >
-                    {/* Liquid blob animation */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                      <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-primary/20 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '3s' }} />
-                      <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-secondary/20 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
-                    </div>
-                    <div className="relative z-10">
-                      <span className="text-2xl md:text-4xl font-display font-bold gradient-text">{stat.value}</span>
-                      <p className="text-[10px] md:text-xs text-muted-foreground mt-1 font-medium">{stat.label}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </RevealSection>
-          </div>
-
-          <div className="lg:col-span-7 space-y-4 md:space-y-6">
-            <RevealSection delay={200}>
-              <p className="text-sm md:text-body text-muted-foreground leading-relaxed">
-                I’m a software engineer and technical consultant who loves turning complex problems into simple, scalable solutions. I started coding early, and over the years, I’ve worked across DevOps, automation, and full-stack systems—building tools that improve reliability, performance, and developer productivity.
+          {/* Current role */}
+          <motion.div {...reveal(1)} className={cn(tile, 'md:col-span-3 lg:col-span-5 bg-black text-white p-7 flex flex-col justify-between min-h-[260px]')}>
+            <img
+              src={synamediaLogo}
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-[58%] w-full object-cover object-center opacity-90 [mask-image:linear-gradient(to_bottom,black_55%,transparent)]"
+              loading="lazy"
+            />
+            <p className="relative sr-only">Currently at Synamedia</p>
+            <div className="relative mt-auto pt-28">
+              <p className="text-sm text-white/60">Currently at Synamedia</p>
+              <p className="mt-1 font-display text-2xl md:text-3xl font-medium leading-tight tracking-[-0.02em]">
+                SRE, DevOps, AI &amp; Automation Engineer
               </p>
-            </RevealSection>
-
-            {/* Award (compact) */}
-            <RevealSection delay={250}>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <button
-                    type="button"
-                    className="group w-full text-left p-4 md:p-5 rounded-2xl md:rounded-3xl liquid-glass-card transition-transform duration-300 hover:scale-[1.01]"
-                    aria-label="View award"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-28 md:w-32 aspect-[4/3] rounded-xl md:rounded-2xl overflow-hidden border border-border/40 shrink-0">
-                        <img
-                          src={awardImage}
-                          alt="Synamedia award"
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs md:text-caption text-muted-foreground font-mono">Award</p>
-                        <p className="text-sm md:text-body font-semibold leading-tight truncate">Synamedia recognition</p>
-                        <p className="text-xs md:text-caption text-muted-foreground">Tap to preview</p>
-                      </div>
-                    </div>
-                  </button>
-                </DialogTrigger>
-
-                <DialogContent className="max-w-3xl overflow-hidden">
-                  <DialogHeader>
-                    <DialogTitle>Award</DialogTitle>
-                    <DialogDescription>Synamedia recognition</DialogDescription>
-                  </DialogHeader>
-                  <div className="rounded-2xl overflow-hidden border border-border/40 bg-black/10">
-                    <img
-                      src={awardImage}
-                      alt="Synamedia award"
-                      className="w-full max-h-[70vh] object-contain"
-                      loading="lazy"
-                    />
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </RevealSection>
-
-            <RevealSection delay={300}>
-              <p className="text-sm md:text-body text-muted-foreground leading-relaxed">
-                Today, I focus on designing systems that are not just functional, but resilient, efficient, and future-ready.
+              <p className="mt-3 max-w-md text-sm leading-relaxed text-white/70">
+                Large-scale, high-availability media and streaming systems: observability, automation and reliability.
               </p>
-            </RevealSection>
+            </div>
+          </motion.div>
 
-            <RevealSection delay={400}>
-              <p className="text-sm md:text-body text-muted-foreground leading-relaxed">
-                I believe great software is built at the intersection of strong engineering fundamentals and real human needs. Whether it’s optimizing infrastructure, automating workflows, or improving user experience, I approach every challenge with curiosity and ownership.
-                <br />
-                <br />
-                I enjoy working on distributed systems, cloud-native architectures, and automation pipelines that make teams faster and systems more reliable.
-              </p>
-            </RevealSection>
-
-            {/* Interests */}
-            <RevealSection delay={500}>
-              <div className="pt-4 md:pt-6 border-t border-border">
-                <p className="text-xs md:text-caption text-muted-foreground mb-3 md:mb-4 font-mono">Outside of code</p>
-                <div className="flex flex-wrap gap-2 md:gap-3">
-                  {[
-                    { icon: Coffee, text: 'Coffee enthusiast' },
-                    { icon: Book, text: 'Sci-fi reader' },
-                    { icon: Headphones, text: 'Lo-fi beats' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-4 md:py-2.5 liquid-glass-badge">
-                      <item.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
-                      <span className="text-xs md:text-caption font-medium">{item.text}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </RevealSection>
-
-            <RevealSection delay={600}>
-              <div className="p-4 md:p-5 rounded-2xl md:rounded-3xl liquid-glass-card">
-                <div className="flex items-center gap-3">
-                  <span className="relative flex h-2.5 w-2.5 md:h-3 md:w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-green-500" />
+          {/* Award */}
+          <Dialog>
+            <DialogTrigger asChild>
+              <motion.button
+                {...reveal(2)}
+                type="button"
+                className={cn(tile, 'group md:col-span-6 lg:col-span-3 lg:row-span-2 min-h-[420px] bg-black text-left')}
+                aria-label="View the India Site Excellence Recognition award"
+              >
+                <img
+                  src={awardImage}
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                  loading="lazy"
+                />
+                <span className="absolute right-4 bottom-4 rounded-full bg-black/40 p-2 text-white backdrop-blur-md">
+                  <Maximize2 className="h-4 w-4" aria-hidden />
+                </span>
+                <span className="absolute inset-x-0 top-0 block bg-gradient-to-b from-black/80 via-black/40 to-transparent p-6 pb-24 pr-14 text-white">
+                  <span className="block text-sm text-white/65">Award · Synamedia</span>
+                  <span className="mt-1 block font-display text-xl font-medium leading-snug tracking-[-0.01em]">
+                    India Site Excellence Recognition
                   </span>
-                  <p className="text-sm md:text-body font-semibold">
-                    Available for interesting projects, consulting, and collaborations
-                  </p>
+                </span>
+              </motion.button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl overflow-hidden p-0">
+              <DialogTitle className="sr-only">India Site Excellence Recognition</DialogTitle>
+              <DialogDescription className="sr-only">Award from Synamedia to Naveen R</DialogDescription>
+              <img src={awardImage} alt="Synamedia India Site Excellence Recognition award for Naveen R" className="max-h-[85vh] w-full object-contain bg-black" />
+            </DialogContent>
+          </Dialog>
+
+          {/* Figures */}
+          <motion.div {...reveal(3)} className={cn(tile, 'md:col-span-6 lg:col-span-5 p-7')}>
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-7">
+              {figures.map((f) => (
+                <div key={f.label}>
+                  <dt className="sr-only">{f.label}</dt>
+                  <dd>
+                    <span className="block font-display text-4xl md:text-5xl font-medium tracking-[-0.04em] tabular-nums">
+                      {f.value}
+                    </span>
+                    <span className="mt-1 block text-sm text-muted-foreground" aria-hidden>
+                      {f.label}
+                    </span>
+                  </dd>
                 </div>
-              </div>
-            </RevealSection>
-          </div>
+              ))}
+            </dl>
+          </motion.div>
+
+          {/* Founder */}
+          <motion.div {...reveal(4)} className={cn(tile, 'md:col-span-6 lg:col-span-7 p-7 md:p-8 flex flex-col sm:flex-row gap-6 sm:items-center')}>
+            <img
+              src={iheLogo}
+              alt="Infinite Horizon Enterprises logo"
+              className="h-28 w-28 shrink-0 rounded-2xl bg-white object-contain p-2 ring-1 ring-border/60"
+              loading="lazy"
+            />
+            <div>
+              <p className="text-sm text-muted-foreground">Founder &amp; Lead Engineer · Since 2022</p>
+              <p className="mt-1 font-display text-2xl md:text-3xl font-medium tracking-[-0.02em]">Infinite Horizon Enterprises</p>
+              <p className="mt-3 text-sm md:text-base leading-relaxed text-muted-foreground text-pretty">
+                Modern websites, scalable web applications and technical training. Production-ready work for colleges,
+                startups and organisations, and mentoring for over 1,500 students across multiple states.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Belief */}
+          <motion.blockquote {...reveal(5)} className={cn(tile, 'md:col-span-6 lg:col-span-5 p-7 md:p-8 flex flex-col justify-between gap-6')}>
+            <p className="font-display text-2xl md:text-[1.75rem] font-medium leading-snug tracking-[-0.02em] text-balance">
+              “Great software is built where strong engineering fundamentals meet real human needs.”
+            </p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Distributed systems, cloud-native architecture and automation pipelines that make teams faster and systems
+              more reliable.
+            </p>
+          </motion.blockquote>
+
+          {/* Outside of code */}
+          <motion.div {...reveal(6)} className={cn(tile, 'md:col-span-3 lg:col-span-5 p-7')}>
+            <p className="text-sm text-muted-foreground">Outside of code</p>
+            <p className="mt-1 font-display text-2xl font-medium tracking-[-0.02em]">YouTuber &amp; AI video creator</p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <a
+                href="https://www.youtube.com/@TechVibeKA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-[#FF0000] px-4 py-2 text-sm font-medium text-white transition-transform duration-300 hover:-translate-y-0.5"
+              >
+                <Youtube className="h-4 w-4" aria-hidden /> TechVibeKA
+              </a>
+              <a
+                href="https://www.instagram.com/techvibe.ka?igsh=engzaDVscDFrcWQ0&utm_source=qr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-medium transition-colors duration-300 hover:bg-muted"
+              >
+                <Instagram className="h-4 w-4" aria-hidden /> techvibe.ka
+              </a>
+              <span className="inline-flex items-center rounded-full border border-border px-4 py-2 text-sm text-muted-foreground">
+                Open source contributor
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Availability */}
+          <motion.a
+            {...reveal(7)}
+            href="#contact"
+            onClick={(e) => {
+              e.preventDefault();
+              document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className={cn(tile, 'group md:col-span-3 lg:col-span-7 p-7 flex flex-col justify-between gap-6 bg-foreground text-background ring-0')}
+          >
+            <span className="inline-flex items-center gap-2 text-sm opacity-70">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
+              </span>
+              Available now
+            </span>
+            <span className="flex items-end justify-between gap-6">
+              <span className="font-display text-2xl md:text-3xl font-medium leading-tight tracking-[-0.02em] text-balance">
+                Open to interesting projects, consulting and collaborations.
+              </span>
+              <span className="shrink-0 rounded-full bg-background/10 p-3 transition-transform duration-300 group-hover:translate-x-1">
+                <ArrowRight className="h-5 w-5" aria-hidden />
+              </span>
+            </span>
+          </motion.a>
         </div>
       </div>
     </section>
   );
 }
+

@@ -1,101 +1,106 @@
-import { RevealSection } from '@/components/RevealSection';
-import { Code2 } from 'lucide-react';
-import { useMemo } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import type { IconType } from 'react-icons';
+import {
+  SiPython, SiOpenjdk, SiReact, SiNodedotjs, SiMongodb, SiMysql, SiPostgresql, SiKubernetes,
+  SiPhp, SiJavascript, SiHtml5, SiAndroidstudio, SiDocker, SiFigma, SiLinux, SiNginx, SiGraphql,
+} from 'react-icons/si';
+import { FaAws } from 'react-icons/fa';
+import { TbApi } from 'react-icons/tb';
 
 interface Skill {
   name: string;
-  icon: string;
-  color: string;
+  icon: IconType;
+  /** Brand color for the tile; glyph is white unless `dark` is set. */
+  bg: string;
+  dark?: boolean;
 }
 
-function SkillCard({ skill }: { skill: Skill }) {
+const S = {
+  python: { name: 'Python', icon: SiPython, bg: '#3776AB' },
+  java: { name: 'Java', icon: SiOpenjdk, bg: '#E76F00' },
+  php: { name: 'PHP', icon: SiPhp, bg: '#777BB4' },
+  js: { name: 'JavaScript', icon: SiJavascript, bg: '#F7DF1E', dark: true },
+  react: { name: 'React', icon: SiReact, bg: '#149ECA' },
+  html: { name: 'HTML & CSS', icon: SiHtml5, bg: '#E34F26' },
+  android: { name: 'Android Studio', icon: SiAndroidstudio, bg: '#3DDC84', dark: true },
+  figma: { name: 'Figma', icon: SiFigma, bg: '#F24E1E' },
+  node: { name: 'Node.js', icon: SiNodedotjs, bg: '#5FA04E' },
+  rest: { name: 'REST APIs', icon: TbApi, bg: '#475569' },
+  graphql: { name: 'GraphQL', icon: SiGraphql, bg: '#E10098' },
+  mysql: { name: 'MySQL', icon: SiMysql, bg: '#4479A1' },
+  postgres: { name: 'PostgreSQL', icon: SiPostgresql, bg: '#4169E1' },
+  mongo: { name: 'MongoDB', icon: SiMongodb, bg: '#47A248' },
+  aws: { name: 'AWS', icon: FaAws, bg: '#232F3E' },
+  docker: { name: 'Docker', icon: SiDocker, bg: '#2496ED' },
+  k8s: { name: 'Kubernetes', icon: SiKubernetes, bg: '#326CE5' },
+  linux: { name: 'Linux', icon: SiLinux, bg: '#FCC624', dark: true },
+  nginx: { name: 'Nginx', icon: SiNginx, bg: '#009639' },
+} satisfies Record<string, Skill>;
+
+const groups: { title: string; skills: Skill[] }[] = [
+  { title: 'Languages', skills: [S.python, S.java, S.js, S.php] },
+  { title: 'Frontend & mobile', skills: [S.react, S.html, S.android, S.figma] },
+  { title: 'Backend & data', skills: [S.node, S.rest, S.graphql, S.mysql, S.postgres, S.mongo] },
+  { title: 'Cloud & DevOps', skills: [S.aws, S.docker, S.k8s, S.linux, S.nginx] },
+];
+
+const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+function SkillRow({ skill }: { skill: Skill }) {
+  const Icon = skill.icon;
   return (
-    <div className="flex-shrink-0 group">
-      <div className="flex items-center gap-3 px-5 py-3 rounded-2xl liquid-glass-card cursor-default">
-        <div
-          className={`w-10 h-10 rounded-xl bg-gradient-to-br ${skill.color} flex items-center justify-center text-lg font-bold text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}
-        >
-          {skill.icon}
-        </div>
-        <span className="font-medium text-sm whitespace-nowrap">{skill.name}</span>
-      </div>
-    </div>
+    <li className="group flex items-center gap-3 py-2.5">
+      <span
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] shadow-[0_4px_10px_-4px_rgba(0,0,0,0.35)] transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:scale-105"
+        style={{ backgroundColor: skill.bg, color: skill.dark ? '#111' : '#fff' }}
+      >
+        <Icon className="h-[18px] w-[18px]" aria-hidden />
+      </span>
+      <span className="text-base font-medium">{skill.name}</span>
+    </li>
   );
 }
 
 export function Skills() {
-  const skills = useMemo<Skill[]>(
-    () => [
-      { name: 'Python', icon: '🐍', color: 'from-yellow-400 to-blue-500' },
-      { name: 'Java', icon: '☕', color: 'from-red-500 to-orange-600' },
-      { name: 'React JS', icon: '⚛️', color: 'from-cyan-400 to-blue-500' },
-      { name: 'Node.js', icon: '🟢', color: 'from-green-500 to-green-700' },
-      { name: 'AWS', icon: '☁️', color: 'from-orange-400 to-yellow-500' },
-      { name: 'MongoDB', icon: '🍃', color: 'from-green-400 to-green-600' },
-      { name: 'MySQL', icon: '🐬', color: 'from-blue-500 to-orange-500' },
-      { name: 'PostgreSQL', icon: '🐘', color: 'from-blue-400 to-indigo-600' },
-      { name: 'Kubernetes', icon: '☸️', color: 'from-blue-500 to-indigo-600' },
-      { name: 'PHP', icon: 'PHP', color: 'from-indigo-500 to-purple-700' },
-      { name: 'HTML / CSS / JS', icon: 'JS', color: 'from-yellow-400 to-yellow-600' },
-      { name: 'Android Studio', icon: '🤖', color: 'from-green-400 to-emerald-600' },
-      { name: 'Docker', icon: '🐳', color: 'from-blue-400 to-cyan-500' },
-      { name: 'Figma', icon: '🎨', color: 'from-purple-500 to-pink-500' },
-      { name: 'Linux', icon: '🐧', color: 'from-yellow-500 to-black' },
-      { name: 'Nginx', icon: '🌐', color: 'from-green-500 to-green-700' },
-      { name: 'GraphQL', icon: '◈', color: 'from-pink-500 to-purple-600' },
-      { name: 'REST API', icon: 'API', color: 'from-slate-500 to-slate-700' },
-    ],
-    []
-  );
-
-  // Duplicate for seamless loop (match the old behavior)
-  const duplicatedSkills = useMemo(() => [...skills, ...skills], [skills]);
-
+  const reduceMotion = useReducedMotion();
   return (
-    <section id="stack" className="py-12 md:py-20 relative overflow-hidden">
-      <div className="max-w-6xl 2xl:max-w-[1400px] mx-auto px-4 sm:px-6 md:px-12 lg:px-24 mb-8">
-        <RevealSection>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 liquid-glass-badge mb-4 md:mb-6">
-            <Code2 className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
-            <span className="text-xs md:text-caption font-medium text-primary">Skills & Technologies</span>
-          </div>
-        </RevealSection>
+    <section id="stack" className="relative py-28 md:py-40 px-5 sm:px-8 md:px-12">
+      <div className="mx-auto max-w-6xl 2xl:max-w-[1400px]">
+        <motion.h2
+          initial={reduceMotion ? false : { opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-15% 0px' }}
+          transition={{ duration: 1, ease: EASE_OUT }}
+          className="font-display text-[clamp(2.75rem,8vw,7rem)] font-medium leading-[0.95] tracking-[-0.045em]"
+        >
+          The <span className="gradient-text">stack.</span>
+        </motion.h2>
+        <motion.p
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-15% 0px' }}
+          transition={{ duration: 1, ease: EASE_OUT, delay: 0.1 }}
+          className="mt-6 max-w-xl text-lg md:text-xl text-muted-foreground text-pretty"
+        >
+          The tools I reach for, from the first commit to production.
+        </motion.p>
 
-        <RevealSection delay={100}>
-          <h2 className="text-2xl sm:text-3xl md:text-heading font-display mb-3 md:mb-4">
-            Technologies I <span className="gradient-text">work with</span>
-          </h2>
-        </RevealSection>
-
-        <RevealSection delay={150}>
-          <p className="text-sm md:text-body text-muted-foreground max-w-xl">
-            A focused set of tools I use regularly.
-          </p>
-        </RevealSection>
-      </div>
-
-      {/* Scrolling container - Row 1 (left to right) */}
-      <div className="relative mb-4">
-        {/* Gradient masks */}
-        <div className="absolute left-0 top-0 bottom-0 w-20 md:w-40 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-20 md:w-40 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-
-        <div className="flex gap-4 animate-scroll-left">
-          {duplicatedSkills.map((skill, index) => (
-            <SkillCard key={`row1-${skill.name}-${index}`} skill={skill} />
-          ))}
-        </div>
-      </div>
-
-      {/* Scrolling container - Row 2 (right to left) */}
-      <div className="relative">
-        {/* Gradient masks */}
-        <div className="absolute left-0 top-0 bottom-0 w-20 md:w-40 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-20 md:w-40 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-
-        <div className="flex gap-4 animate-scroll-right">
-          {[...duplicatedSkills].reverse().map((skill, index) => (
-            <SkillCard key={`row2-${skill.name}-${index}`} skill={skill} />
+        <div className="mt-14 md:mt-20 grid grid-cols-2 lg:grid-cols-4 gap-x-6 sm:gap-x-10 gap-y-12">
+          {groups.map((group, g) => (
+            <motion.div
+              key={group.title}
+              initial={reduceMotion ? false : { opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-10% 0px' }}
+              transition={{ duration: 0.9, ease: EASE_OUT, delay: g * 0.08 }}
+            >
+              <h3 className="border-b border-border pb-3 text-sm font-medium text-muted-foreground">{group.title}</h3>
+              <ul className="mt-2">
+                {group.skills.map((skill) => (
+                  <SkillRow key={skill.name} skill={skill} />
+                ))}
+              </ul>
+            </motion.div>
           ))}
         </div>
       </div>

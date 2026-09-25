@@ -1,6 +1,5 @@
 import { RevealSection } from '@/components/RevealSection';
 import { ParallaxOrb } from '@/components/ParallaxOrb';
-import { BriefcaseBusiness } from 'lucide-react';
 import brandLogo from '@/assets/logo.jpeg';
 
 export function Founder() {
@@ -16,17 +15,11 @@ export function Founder() {
       </div>
 
       <div className="max-w-6xl 2xl:max-w-[1400px] mx-auto relative">
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-start p-4 md:p-8 rounded-3xl border border-border/10 bg-background/20 backdrop-blur-sm">
           <div className="lg:col-span-5">
-            <RevealSection>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 liquid-glass-badge mb-4 md:mb-6">
-                <BriefcaseBusiness className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
-                <span className="text-xs md:text-caption font-medium text-primary">Founder</span>
-              </div>
-            </RevealSection>
 
             <RevealSection delay={100}>
-              <h2 className="text-2xl sm:text-3xl md:text-heading font-display mb-4 md:mb-6">
+              <h2 className="text-3xl sm:text-4xl md:text-heading font-display mb-4 md:mb-6">
                 Infinite Horizon <span className="gradient-text">Enterprises</span>
               </h2>
             </RevealSection>
@@ -56,17 +49,18 @@ export function Founder() {
             </RevealSection>
 
             <RevealSection delay={300}>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
                   { value: '4+', label: 'Years of Experience' },
                   { value: '50+', label: 'Projects Delivered' },
+                  { value: '100+', label: 'Clients' },
                   { value: '1500+', label: 'Students Trained' },
                 ].map((stat) => (
                   <div
                     key={stat.label}
                     className="p-4 md:p-5 rounded-2xl md:rounded-3xl liquid-glass-card text-center"
                   >
-                    <span className="text-2xl md:text-4xl font-display font-bold gradient-text">{stat.value}</span>
+                    <span className="text-2xl md:text-4xl font-display font-bold gradient-text tabular-nums">{stat.value}</span>
                     <p className="text-[10px] md:text-xs text-muted-foreground mt-1 font-medium">{stat.label}</p>
                   </div>
                 ))}
