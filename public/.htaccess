@@ -1,0 +1,34 @@
+# Hostinger (LiteSpeed/Apache): one canonical home at https://naveenrdev.in
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Force HTTPS
+  RewriteCond %{HTTPS} off
+  RewriteRule ^ https://naveenrdev.in%{REQUEST_URI} [L,R=301]
+
+  # www -> apex
+  RewriteCond %{HTTP_HOST} ^www\.naveenrdev\.in$ [NC]
+  RewriteRule ^ https://naveenrdev.in%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Compress text assets
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml application/xml text/xml
+</IfModule>
+
+# Cache: hashed build assets forever, media for a month, HTML always fresh
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|woff2?)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(webp|jpg|jpeg|png|ico|mp4|otf|pdf)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+  <FilesMatch "\.(html|xml|txt)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+ErrorDocument 404 /index.html

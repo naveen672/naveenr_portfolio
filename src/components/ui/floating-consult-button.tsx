@@ -23,7 +23,7 @@ interface FloatingConsultButtonProps {
 const CIRCLE_LENGTH = 2 * Math.PI * 75;
 
 export const FloatingConsultButton = ({
-  imageSrc = "/naveenr_updated.png",
+  imageSrc = "/naveen-r.jpg",
   imageAlt = "",
   revolvingText = "FREE 30 MINUTES - CONSULT - ",
   revolvingSpeed = 10,
