@@ -1328,29 +1328,71 @@ html {
   }
 }
 
-/* ── Hero: "break through the clouds" ─────────────────────────── */
-/* Sky matches the cloud frames (rgb 192 213 226) so the covered state paints before frames load. */
-.hero-sky {
-  background: linear-gradient(180deg, #b9cfdd 0%, #c6d9e5 55%, #d6e4ec 100%);
+/* ── Hero: "fly through your name" ─────────────────────────────── */
+/* Day sky (light theme). Pale near the middle so the letters glow against the dark stage,
+   and so navy text stays well above 4.5:1 once you land. */
+.hero-world {
+  background: linear-gradient(180deg, #5fa8e4 0%, #8cc4ef 38%, #bfe0f8 70%, #e3f1fb 100%);
 }
-.hero-title {
-  color: #13263a;
+.hero-sun {
+  left: 62%;
+  top: 8%;
+  width: 46vmax;
+  height: 46vmax;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, rgba(255, 244, 214, 0.9), rgba(255, 236, 190, 0.35) 45%, transparent 72%);
 }
-.hero-subtitle {
-  color: #2d4a63;
+.hero-stars { opacity: 0; }
+.hero-cloud-a { animation: hero-cloud-drift 38s ease-in-out infinite alternate; }
+.hero-cloud-b { animation: hero-cloud-drift-flipped 52s ease-in-out infinite alternate; }
+@keyframes hero-cloud-drift {
+  from { transform: translateX(-3%); }
+  to { transform: translateX(3%); }
 }
-.dark .hero-sky {
-  background: linear-gradient(180deg, #0a1422 0%, #101d2e 60%, #16273b 100%);
+@keyframes hero-cloud-drift-flipped {
+  from { transform: scaleX(-1) translateX(-3%); }
+  to { transform: scaleX(-1) translateX(3%); }
 }
-/* Night clouds: the same frames, dimmed to moonlight */
-.dark .hero-clouds {
-  filter: brightness(0.34) saturate(2.4) hue-rotate(6deg);
+.hero-ink { color: #0c2340; }
+.hero-ink-soft { color: #26476d; }
+.hero-cta { background: #0c2340; color: #fff; box-shadow: 0 12px 30px -12px rgba(12, 35, 64, 0.55); }
+.hero-cta-secondary { color: #0c2340; border: 1px solid rgba(12, 35, 64, 0.25); background: rgba(255, 255, 255, 0.35); }
+.hero-cta-secondary:hover { background: rgba(255, 255, 255, 0.6); }
+
+/* Night sky (dark theme) */
+.dark .hero-world {
+  background: linear-gradient(180deg, #0b1c3a 0%, #22508f 34%, #3a70b2 52%, #2a5b98 72%, #1d4378 100%);
 }
-.dark .hero-title {
-  color: #e8f1f8;
+.dark .hero-sun {
+  left: 68%;
+  top: 10%;
+  width: 22vmax;
+  height: 22vmax;
+  background: radial-gradient(closest-side, rgba(235, 242, 255, 0.95), rgba(190, 210, 245, 0.35) 30%, transparent 70%);
 }
-.dark .hero-subtitle {
-  color: #a9bfd2;
+.dark .hero-stars {
+  opacity: 0.9;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent),
+    radial-gradient(1px 1px at 28% 32%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 44% 12%, #fff, transparent),
+    radial-gradient(1px 1px at 58% 28%, #fff, transparent),
+    radial-gradient(1px 1px at 76% 40%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 88% 16%, #fff, transparent),
+    radial-gradient(1px 1px at 20% 48%, #fff, transparent),
+    radial-gradient(1px 1px at 66% 8%, #fff, transparent),
+    radial-gradient(1px 1px at 94% 52%, #fff, transparent),
+    radial-gradient(1px 1px at 36% 58%, #fff, transparent);
+}
+.dark .hero-cloud-band { filter: brightness(0.42) saturate(1.8) hue-rotate(4deg); }
+.dark .hero-ink { color: #eef5fc; }
+.dark .hero-ink-soft { color: #b9cde3; }
+.dark .hero-cta { background: #fff; color: #0a1a36; box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.6); }
+.dark .hero-cta-secondary { color: #fff; border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.08); }
+.dark .hero-cta-secondary:hover { background: rgba(255, 255, 255, 0.16); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-cloud-a, .hero-cloud-b { animation: none; }
 }
 .hero-cue-track {
   background: color-mix(in srgb, currentColor 22%, transparent);
