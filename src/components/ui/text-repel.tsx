@@ -18,6 +18,8 @@ interface TextRepelProps {
   stiffness?: number;
   damping?: number;
   mass?: number;
+  /** Screen-reader text; pass false when the parent already provides the accessible text. */
+  srText?: string | false;
 }
 
 function RepelLetter({
@@ -120,6 +122,7 @@ export function TextRepel({
   stiffness = 180,
   damping = 14,
   mass = 0.4,
+  srText,
 }: TextRepelProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(-9999);
@@ -144,7 +147,7 @@ export function TextRepel({
         mouseY.set(-9999);
       }}
     >
-      <span className="sr-only">{text}</span>
+      {srText !== false && <span className="sr-only">{srText ?? text}</span>}
       {/* Letters are grouped per word so lines only wrap between words. */}
       {text.split(" ").map((word, w, words) => (
         <span key={w} className="inline-flex whitespace-nowrap" aria-hidden>

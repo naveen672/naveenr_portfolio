@@ -36,9 +36,7 @@ __pycache__/
 /cloudsanimation.svg
 /LastoriaBoldRegular.otf
 /naveenr_updated.png
-/public/clouds_animation.mp4
-/public/clouds_animation2.mp4
-/public/naveen_intro.mp4
+/media-src/
 /src/assets/cloud.json
 /src/assets/jssp.png
 /src/assets/jsspn.png
@@ -58,3 +56,5 @@ __pycache__/
 /src/components/ui/portfolio-and-image-gallery.tsx
 /src/components/ui/scroll-based-velocity.tsx
 /src/components/ui/sticky-scroll-cards.tsx
+/naveenr-resume.pdf
+dist*.zip

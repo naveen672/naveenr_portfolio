@@ -93,26 +93,9 @@ export function Contact() {
 
   return (
     // `dark` scopes the dark tokens to this finale, whatever the site theme is.
-    <section id="contact" data-nav-tone="dark" className="dark relative overflow-hidden bg-[#07080b] text-foreground px-5 sm:px-8 md:px-12 pt-28 md:pt-40 pb-20">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-[60vh] w-[90vw] -translate-x-1/2 -translate-y-1/3 rounded-full blur-[120px] opacity-30"
-        style={{ background: 'radial-gradient(closest-side, hsl(195 80% 55%), transparent)' }}
-      />
-
+    <section id="contact" data-nav-tone="dark" className="dark relative overflow-hidden bg-[#07080b] text-foreground px-5 sm:px-8 md:px-12 pt-4 md:pt-8 pb-20">
       <div className="relative mx-auto max-w-6xl 2xl:max-w-[1400px]">
-        <RevealSection>
-          <h2 className="font-display text-[clamp(3rem,10vw,9rem)] font-medium leading-[0.92] tracking-[-0.05em] text-balance">
-            Let’s build <span className="gradient-text">something.</span>
-          </h2>
-        </RevealSection>
-        <RevealSection delay={100}>
-          <p className="mt-6 max-w-xl text-lg md:text-xl text-muted-foreground text-pretty">
-            Always interested in hearing about new projects, collaborations, or just chatting about tech.
-          </p>
-        </RevealSection>
-
-        <div className="mt-14 md:mt-20 grid gap-10 lg:grid-cols-12 lg:gap-16">
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
           {/* Form */}
           <RevealSection delay={150} className="lg:col-span-7">
             <form
