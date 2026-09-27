@@ -1,4 +1,13 @@
-import { motion, useReducedMotion } from 'framer-motion';
+import { useRef } from 'react';
+import {
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from 'framer-motion';
 import type { IconType } from 'react-icons';
 import {
   SiPython, SiOpenjdk, SiReact, SiNodedotjs, SiMongodb, SiMysql, SiPostgresql, SiKubernetes,
@@ -46,62 +55,170 @@ const groups: { title: string; skills: Skill[] }[] = [
 
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-function SkillRow({ skill }: { skill: Skill }) {
+// Deterministic "random" so the scatter is identical on every visit and render
+function seeded(n: number) {
+  const x = Math.sin(n * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+const COUNT = groups.reduce((n, g) => n + g.skills.length, 0);
+// Fly-in order shuffled across columns so the grid fills from everywhere at once
+const ORDER = Array.from({ length: COUNT }, (_, i) => i).sort((a, b) => seeded(a + 7) - seeded(b + 7));
+
+interface Scatter {
+  x: number; // vw
+  y: number; // vh
+  z: number; // px, into the screen
+  rx: number;
+  ry: number;
+  rz: number;
+  start: number; // progress at which this tile launches
+}
+
+function scatterFor(index: number): Scatter {
+  const r = (k: number) => seeded(index * 11 + k);
+  return {
+    x: (r(1) - 0.5) * 140,
+    y: (r(2) - 0.5) * 110,
+    z: -(900 + r(3) * 2600),
+    rx: (r(4) - 0.5) * 160,
+    ry: (r(5) - 0.5) * 200,
+    rz: (r(6) - 0.5) * 120,
+    start: 0.04 + (ORDER.indexOf(index) / (COUNT - 1)) * 0.42,
+  };
+}
+
+const FLIGHT = 0.34; // share of the scroll each tile spends flying
+
+function SkillTile({ skill }: { skill: Skill }) {
   const Icon = skill.icon;
   return (
-    <li className="group flex items-center gap-3 py-2.5">
+    <>
       <span
         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] shadow-[0_4px_10px_-4px_rgba(0,0,0,0.35)] transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:scale-105"
         style={{ backgroundColor: skill.bg, color: skill.dark ? '#111' : '#fff' }}
       >
         <Icon className="h-[18px] w-[18px]" aria-hidden />
       </span>
-      <span className="text-base font-medium">{skill.name}</span>
-    </li>
+      <span className="text-sm sm:text-base font-medium">{skill.name}</span>
+    </>
+  );
+}
+
+/** A tile that flies in from its scattered spot in deep space and lands in its slot. */
+function FlyingRow({ skill, index, p }: { skill: Skill; index: number; p: MotionValue<number> }) {
+  const sc = scatterFor(index);
+  // Eased local progress: fast launch, soft landing
+  const e = useTransform(p, (v) => {
+    const t = Math.min(1, Math.max(0, (v - sc.start) / FLIGHT));
+    return 1 - Math.pow(1 - t, 3);
+  });
+  const x = useTransform(e, (k) => `${sc.x * (1 - k)}vw`);
+  const y = useTransform(e, (k) => `${sc.y * (1 - k)}vh`);
+  const z = useTransform(e, (k) => sc.z * (1 - k));
+  const rotateX = useTransform(e, (k) => sc.rx * (1 - k));
+  const rotateY = useTransform(e, (k) => sc.ry * (1 - k));
+  const rotateZ = useTransform(e, (k) => sc.rz * (1 - k));
+  // Already visible as faint shapes drifting in the distance, brightening as they approach
+  const opacity = useTransform(p, [0, sc.start, sc.start + FLIGHT * 0.5], [0.35, 0.5, 1]);
+
+  return (
+    <motion.li
+      className="group flex items-center gap-3 py-1.5 sm:py-2.5 will-change-transform"
+      style={{ x, y, z, rotateX, rotateY, rotateZ, opacity }}
+    >
+      <SkillTile skill={skill} />
+    </motion.li>
+  );
+}
+
+function Heading({ animateIn }: { animateIn: boolean }) {
+  return (
+    <>
+      <motion.h2
+        initial={animateIn ? { opacity: 0, y: 30 } : false}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-15% 0px' }}
+        transition={{ duration: 1, ease: EASE_OUT }}
+        className="font-display text-[clamp(2.75rem,8vw,7rem)] font-medium leading-[0.95] tracking-[-0.045em]"
+      >
+        The <span className="gradient-text">stack.</span>
+      </motion.h2>
+      <motion.p
+        initial={animateIn ? { opacity: 0, y: 20 } : false}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-15% 0px' }}
+        transition={{ duration: 1, ease: EASE_OUT, delay: 0.1 }}
+        className="mt-4 md:mt-6 max-w-xl text-lg md:text-xl text-muted-foreground text-pretty"
+      >
+        The tools I reach for, from the first commit to production.
+      </motion.p>
+    </>
+  );
+}
+
+const gridClass = 'grid grid-cols-2 lg:grid-cols-4 gap-x-6 sm:gap-x-10 gap-y-6 sm:gap-y-12';
+
+/** Reduced motion: the finished grid. */
+function StaticStack() {
+  return (
+    <section id="stack" className="relative py-28 md:py-40 px-5 sm:px-8 md:px-12">
+      <div className="mx-auto max-w-6xl 2xl:max-w-[1400px]">
+        <Heading animateIn={false} />
+        <div className={`mt-14 md:mt-20 ${gridClass}`}>
+          {groups.map((group) => (
+            <div key={group.title}>
+              <h3 className="border-b border-border pb-3 text-sm font-medium text-muted-foreground">{group.title}</h3>
+              <ul className="mt-2">
+                {group.skills.map((skill) => (
+                  <li key={skill.name} className="group flex items-center gap-3 py-2.5">
+                    <SkillTile skill={skill} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
 export function Skills() {
   const reduceMotion = useReducedMotion();
-  return (
-    <section id="stack" className="relative py-28 md:py-40 px-5 sm:px-8 md:px-12">
-      <div className="mx-auto max-w-6xl 2xl:max-w-[1400px]">
-        <motion.h2
-          initial={reduceMotion ? false : { opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-15% 0px' }}
-          transition={{ duration: 1, ease: EASE_OUT }}
-          className="font-display text-[clamp(2.75rem,8vw,7rem)] font-medium leading-[0.95] tracking-[-0.045em]"
-        >
-          The <span className="gradient-text">stack.</span>
-        </motion.h2>
-        <motion.p
-          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-15% 0px' }}
-          transition={{ duration: 1, ease: EASE_OUT, delay: 0.1 }}
-          className="mt-6 max-w-xl text-lg md:text-xl text-muted-foreground text-pretty"
-        >
-          The tools I reach for, from the first commit to production.
-        </motion.p>
+  const stageRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: stageRef, offset: ['start start', 'end end'] });
+  // Plain motion value (see Opening): keeps transforms off the page-wide native ScrollTimeline.
+  const p = useMotionValue(0);
+  useMotionValueEvent(scrollYProgress, 'change', (v) => p.set(v));
+  const labelsOpacity = useTransform(p, [0.62, 0.8], [0, 1]);
+  const labelsY = useTransform(p, [0.62, 0.8], [12, 0]);
 
-        <div className="mt-14 md:mt-20 grid grid-cols-2 lg:grid-cols-4 gap-x-6 sm:gap-x-10 gap-y-12">
-          {groups.map((group, g) => (
-            <motion.div
-              key={group.title}
-              initial={reduceMotion ? false : { opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-10% 0px' }}
-              transition={{ duration: 0.9, ease: EASE_OUT, delay: g * 0.08 }}
-            >
-              <h3 className="border-b border-border pb-3 text-sm font-medium text-muted-foreground">{group.title}</h3>
-              <ul className="mt-2">
-                {group.skills.map((skill) => (
-                  <SkillRow key={skill.name} skill={skill} />
-                ))}
-              </ul>
-            </motion.div>
-          ))}
+  if (reduceMotion) return <StaticStack />;
+
+  let index = 0;
+  return (
+    <section id="stack" ref={stageRef} className="relative h-[280vh]">
+      <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden px-5 sm:px-8 md:px-12">
+        <div className="mx-auto w-full max-w-6xl 2xl:max-w-[1400px]">
+          <Heading animateIn />
+          <div className={`mt-8 md:mt-16 ${gridClass}`} style={{ perspective: 1100 }}>
+            {groups.map((group) => (
+              <div key={group.title} className="[transform-style:preserve-3d]">
+                <motion.h3
+                  className="border-b border-border pb-2 sm:pb-3 text-sm font-medium text-muted-foreground"
+                  style={{ opacity: labelsOpacity, y: labelsY }}
+                >
+                  {group.title}
+                </motion.h3>
+                <ul className="mt-1 sm:mt-2 [transform-style:preserve-3d]">
+                  {group.skills.map((skill) => (
+                    <FlyingRow key={skill.name} skill={skill} index={index++} p={p} />
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
