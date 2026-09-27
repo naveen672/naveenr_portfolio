@@ -9,8 +9,7 @@ import {
   type MotionValue,
 } from 'framer-motion';
 import { ArrowRight, Download } from 'lucide-react';
-import * as opentype from 'opentype.js';
-import fontUrl from '@fontsource/space-grotesk/files/space-grotesk-latin-700-normal.woff?url';
+import { measureWord, zoomTransform, type WordLayout } from '@/lib/word-zoom';
 
 const typingPhrases = [
   'I build for the web',
@@ -49,87 +48,6 @@ function useTypingPhrase() {
   return text;
 }
 
-interface Layout {
-  w: number;
-  h: number;
-  fontSize: number;
-  baseline: number;
-  d: string; // NAVEEN as an exact vector outline
-  ox: number; // zoom origin: the deepest point inside the A
-  oy: number;
-  maxZoom: number; // enough for the A's stroke around the origin to cover the whole screen
-}
-
-let fontPromise: Promise<opentype.Font> | null = null;
-const loadFont = () =>
-  (fontPromise ??= fetch(fontUrl)
-    .then((r) => r.arrayBuffer())
-    .then((buf) => opentype.parse(buf)));
-
-/**
- * Lays NAVEEN out as vector outlines from the font file itself, so the cut-out and the maths below use
- * one identical shape. The zoom origin is the point inside the A farthest from any edge (a chamfer
- * distance transform over the rasterised outline), and that depth tells us exactly how far to zoom
- * for the stroke to swallow the whole screen.
- */
-async function measure(w: number, h: number): Promise<Layout> {
-  const font = await loadFont();
-  const ratio = font.getAdvanceWidth(WORD, 100) / 100;
-  const fontSize = Math.min((w * 0.88) / ratio, h * 0.42);
-  const total = font.getAdvanceWidth(WORD, fontSize);
-  const os2 = (font.tables as { os2?: { sCapHeight?: number } }).os2;
-  const capHeight = ((os2?.sCapHeight || font.unitsPerEm * 0.7) / font.unitsPerEm) * fontSize;
-  const x = (w - total) / 2;
-  const baseline = h / 2 + capHeight / 2;
-
-  const d = font.getPath(WORD, x, baseline, fontSize).toPathData(2);
-  const aPath = font.getPaths(WORD, x, baseline, fontSize)[1];
-  const box = aPath.getBoundingBox();
-
-  const bx = Math.floor(box.x1) - 2;
-  const by = Math.floor(box.y1) - 2;
-  const bw = Math.ceil(box.x2 - box.x1) + 4;
-  const bh = Math.ceil(box.y2 - box.y1) + 4;
-  const canvas = document.createElement('canvas');
-  canvas.width = bw;
-  canvas.height = bh;
-  const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
-  ctx.translate(-bx, -by);
-  ctx.fill(new Path2D(aPath.toPathData(2)));
-  const px = ctx.getImageData(0, 0, bw, bh).data;
-
-  // Two-pass chamfer distance: distance of each solid pixel to the nearest empty one
-  const dist = new Float32Array(bw * bh);
-  for (let i = 0; i < bw * bh; i++) dist[i] = px[i * 4 + 3] > 128 ? 1e9 : 0;
-  const at = (xx: number, yy: number) => (xx < 0 || yy < 0 || xx >= bw || yy >= bh ? 0 : dist[yy * bw + xx]);
-  for (let yy = 0; yy < bh; yy++)
-    for (let xx = 0; xx < bw; xx++) {
-      const i = yy * bw + xx;
-      if (dist[i] === 0) continue;
-      dist[i] = Math.min(dist[i], at(xx - 1, yy) + 1, at(xx, yy - 1) + 1, at(xx - 1, yy - 1) + 1.414, at(xx + 1, yy - 1) + 1.414);
-    }
-  let best = 0;
-  let ox = (box.x1 + box.x2) / 2;
-  let oy = (box.y1 + box.y2) / 2;
-  for (let yy = bh - 1; yy >= 0; yy--)
-    for (let xx = bw - 1; xx >= 0; xx--) {
-      const i = yy * bw + xx;
-      if (dist[i] === 0) continue;
-      dist[i] = Math.min(dist[i], at(xx + 1, yy) + 1, at(xx, yy + 1) + 1, at(xx + 1, yy + 1) + 1.414, at(xx - 1, yy + 1) + 1.414);
-      if (dist[i] > best) {
-        best = dist[i];
-        ox = bx + xx + 0.5;
-        oy = by + yy + 0.5;
-      }
-    }
-
-  // Scale needed for a disc of radius `best` around the origin to reach the farthest screen corner
-  const farthest = Math.max(Math.hypot(ox, oy), Math.hypot(w - ox, oy), Math.hypot(ox, h - oy), Math.hypot(w - ox, h - oy));
-  const maxZoom = Math.max(20, (farthest / Math.max(best - 1, 1)) * 1.15);
-
-  return { w, h, fontSize, baseline, d, ox, oy, maxZoom };
-}
-
 function HeroActions() {
   return (
     <div className="flex flex-col sm:flex-row gap-3">
@@ -146,7 +64,7 @@ function HeroActions() {
       </a>
       <a
         href="/Naveen_resume.pdf"
-        download="Naveen_Resume.pdf"
+        download="Naveen_R_Resume.pdf"
         className="hero-cta-secondary inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 font-medium backdrop-blur-md transition-colors duration-300"
       >
         <Download className="w-4 h-4" aria-hidden />
@@ -175,7 +93,7 @@ export function Opening() {
   const stageRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const zoomRef = useRef<SVGGElement>(null);
-  const [layout, setLayout] = useState<Layout | null>(null);
+  const [layout, setLayout] = useState<WordLayout | null>(null);
   const role = useTypingPhrase();
 
   const { scrollYProgress } = useScroll({ target: stageRef, offset: ['start start', 'end end'] });
@@ -195,11 +113,7 @@ export function Opening() {
   const applyZoom = (v: number) => {
     const g = zoomRef.current;
     if (!g || !layout) return;
-    const s = Math.pow(layout.maxZoom, Math.min(1, Math.max(0, (v - 0.04) / 0.52)));
-    g.setAttribute(
-      'transform',
-      `translate(${layout.ox} ${layout.oy}) scale(${s}) translate(${-layout.ox} ${-layout.oy})`
-    );
+    g.setAttribute('transform', zoomTransform(layout, v, 0.04, 0.52));
   };
 
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
@@ -216,7 +130,7 @@ export function Opening() {
     if (!el) return;
     let cancelled = false;
     const update = () =>
-      measure(el.clientWidth, el.clientHeight)
+      measureWord(WORD, 1, el.clientWidth, el.clientHeight)
         .then((l) => {
           if (!cancelled) setLayout(l);
         })

@@ -56,3 +56,5 @@ __pycache__/
 /src/components/ui/portfolio-and-image-gallery.tsx
 /src/components/ui/scroll-based-velocity.tsx
 /src/components/ui/sticky-scroll-cards.tsx
+/naveenr-resume.pdf
+dist*.zip

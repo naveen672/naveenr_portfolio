@@ -1414,3 +1414,9 @@ html {
   animation: none;
   mix-blend-mode: normal;
 }
+
+/* ── Contact portal: the finale's night light, seen through HELLO ── */
+.portal-glow {
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, hsl(192 90% 62%) 0%, hsl(200 85% 48%) 22%, hsl(218 70% 30%) 48%, transparent 72%);
+}

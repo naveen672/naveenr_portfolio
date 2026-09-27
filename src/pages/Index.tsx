@@ -5,6 +5,7 @@ import { Opening } from '@/components/sections/Opening';
 import { Work } from '@/components/sections/Work';
 import { Skills } from '@/components/sections/Skills';
 import { About } from '@/components/sections/About';
+import { ContactPortal } from '@/components/sections/ContactPortal';
 import { Contact } from '@/components/sections/Contact';
 import { Footer } from '@/components/sections/Footer';
 import { FloatingConsultButton } from '@/components/ui/floating-consult-button';
@@ -24,11 +25,11 @@ const Index = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show after the hero; hide once Contact is on screen, where it would be redundant
-      // and would cover the form and footer controls.
+      // Show after the hero; hide from the HELLO portal on, where it would be redundant
+      // and would cover the portal, the form and the footer controls.
       const stackTop = document.getElementById('stack')?.getBoundingClientRect().top ?? Infinity;
       const pastHero = stackTop < window.innerHeight * 0.5;
-      const contactTop = document.getElementById('contact')?.getBoundingClientRect().top ?? Infinity;
+      const contactTop = document.getElementById('hello')?.getBoundingClientRect().top ?? Infinity;
       setShowFloatingButton(pastHero && contactTop > window.innerHeight * 0.6);
     };
 
@@ -51,6 +52,7 @@ const Index = () => {
           <Skills />
           <Work />
           <About />
+          <ContactPortal />
           <Contact />
         </main>
         <Footer />
