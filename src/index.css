@@ -1444,3 +1444,17 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .solar-core::after { animation: none; }
 }
+
+/* ── Visitor dashboard chart tokens (validated: dataviz palette slots 1–2 on these surfaces) ── */
+:root {
+  --viz-1: #2a78d6; /* page views */
+  --viz-2: #eb6834; /* unique visitors */
+  --viz-grid: #e8e8e4;
+  --viz-axis: #898781;
+}
+.dark {
+  --viz-1: #3987e5;
+  --viz-2: #d95926;
+  --viz-grid: #2c2e31;
+  --viz-axis: #898781;
+}

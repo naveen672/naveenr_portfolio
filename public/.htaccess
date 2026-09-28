@@ -9,6 +9,12 @@
   # www -> apex
   RewriteCond %{HTTP_HOST} ^www\.naveenrdev\.in$ [NC]
   RewriteRule ^ https://naveenrdev.in%{REQUEST_URI} [L,R=301]
+
+  # App routes (e.g. /stats) are served by index.html; real files and /api pass through
+  RewriteCond %{REQUEST_URI} !^/api/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ /index.html [L]
 </IfModule>
 
 # Compress text assets

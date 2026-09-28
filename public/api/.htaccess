@@ -1,0 +1,11 @@
+# Visitor API: only the two endpoints are reachable; config and helpers are not.
+Options -Indexes
+
+<FilesMatch "^(config|config\.example|db)\.php$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-store"
+  Header always set X-Robots-Tag "noindex, nofollow"
+</IfModule>

@@ -58,3 +58,4 @@ __pycache__/
 /src/components/ui/sticky-scroll-cards.tsx
 /naveenr-resume.pdf
 dist*.zip
+/public/api/config.php

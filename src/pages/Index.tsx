@@ -11,6 +11,7 @@ import { Footer } from '@/components/sections/Footer';
 import { FloatingConsultButton } from '@/components/ui/floating-consult-button';
 import { Agentation } from 'agentation';
 import ReactLenis from 'lenis/react';
+import { startTracking } from '@/lib/visitors';
 import naveenImage from '@/assets/about/portrait.webp';
 
 const Index = () => {
@@ -22,6 +23,8 @@ const Index = () => {
     setShowSplash(false);
     setTimeout(() => setContentVisible(true), 100);
   };
+
+  useEffect(() => startTracking(), []);
 
   useEffect(() => {
     const handleScroll = () => {

@@ -1,5 +1,6 @@
 import { ArrowUp } from 'lucide-react';
 import { Signature } from '@/components/ui/signature';
+import { VisitorCount } from '@/components/VisitorCount';
 
 const links = [
   { label: 'Stack', href: '#stack' },
@@ -39,8 +40,11 @@ export function Footer() {
           </nav>
         </div>
 
-        <div className="mt-12 flex items-center justify-between gap-4 text-sm text-muted-foreground">
-          <p>© 2025–2026 Naveen R</p>
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-6">
+            <p>© 2025–2026 Naveen R</p>
+            <VisitorCount />
+          </div>
           <button
             type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
