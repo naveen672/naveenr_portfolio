@@ -16,4 +16,7 @@ return [
     'hash_salt' => 'change-me-to-another-long-random-string',
 
     'timezone' => 'Asia/Kolkata',
+
+    // Set to true only while fixing a connection problem: errors then include MySQL's reason.
+    'debug' => false,
 ];

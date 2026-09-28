@@ -36,6 +36,10 @@ function db(): PDO
         return $pdo;
     }
     $c = config();
+    $debug = !empty($c['debug']);
+    if (!extension_loaded('pdo_mysql')) {
+        respond(['error' => 'db_unavailable'] + ($debug ? ['detail' => 'PHP extension pdo_mysql is not enabled'] : []), 503);
+    }
     try {
         $pdo = new PDO(
             "mysql:host={$c['db_host']};dbname={$c['db_name']};charset=utf8mb4",
@@ -48,7 +52,9 @@ function db(): PDO
             ]
         );
     } catch (PDOException $e) {
-        respond(['error' => 'db_unavailable'], 503);
+        // With 'debug' => true in config.php the reason is shown (MySQL never includes the password).
+        // Turn it off again once connected.
+        respond(['error' => 'db_unavailable'] + ($debug ? ['detail' => $e->getMessage()] : []), 503);
     }
     ensure_schema($pdo);
     return $pdo;
